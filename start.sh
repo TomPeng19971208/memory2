@@ -2,10 +2,10 @@
 
 export MIX_ENV=prod
 export PORT=4791
-
+dir=/home/memory
 echo "Stopping old copy of app, if any..."
 
-_build/prod/rel/memory/bin/memory stop || true
+$dir/_build/prod/rel/memory/bin/memory stop || true
 
 echo "Starting app..."
 
@@ -13,7 +13,7 @@ echo "Starting app..."
 #_build/prod/rel/memory/bin/memory start
 
 # Foreground for testing and for systemd
-_build/prod/rel/memory/bin/memory foreground
+$dir/_build/prod/rel/memory/bin/memory foreground
 
 # TODO: Add a cron rule or systemd service file
 #       to start your app on system boot.

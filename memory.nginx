@@ -3,10 +3,10 @@ server {
     listen [::]:80;
 
     # TODO: This should be your server name.
-    server_name memory.ironbeard.com;
+    server_name hw04.zy-peng.com;
 
     location / {
-        proxy_pass http://hw04.zy-peng.com;
+        proxy_pass http://localhost:4791;
     }
 
     location /socket {
