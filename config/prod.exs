@@ -14,7 +14,7 @@ config :memory, MemoryWeb.Endpoint,
   root: ".",
   version: Application.spec(:phoenix_distillery, :vsn),
   http: [:inet6, port: {:system, "PORT"}],
-  url: [host: "memory1.ironbeard.com", port: 80],
+  url: [host: "http://hw04.zy-peng.com", port: 2222],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
 # Do not print debug messages in production

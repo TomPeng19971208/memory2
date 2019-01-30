@@ -20,7 +20,7 @@ import $ from "jquery";
 import game_init from "./starter-game";
 
 $(() => {
-  let root = $('#root')[0];
+  let root = document.getElementById('root');
   game_init(root);
 });
 

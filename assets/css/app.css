@@ -1,9 +1,14 @@
 /* This file is for your main application css. */
 
 @import "~milligram/dist/milligram";
-
-.column > p {
-    padding-top: 10ex;
-    text-align: center;
+.card{
+    border: solid black;
+    height: 100px;
+    width: 100px;
+    display: inline-block;
+    font-size: 50px;
+    padding: 10px;
+    margin: 5px;
 }
+  
 
