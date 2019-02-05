@@ -3,7 +3,7 @@ server {
     listen [::]:80;
 
     # TODO: This should be your server name.
-    server_name hw04.zy-peng.com;
+    server_name memory2.zy-peng.com;
 
     location / {
         proxy_pass http://localhost:4791;

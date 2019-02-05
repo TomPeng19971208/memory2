@@ -115,7 +115,7 @@ defmodule Memory.Game do
           |>Map.put(:grids, new_deck)
           |>Map.put(:steps, game.steps+1)
           |>Map.put(:flipped, game.flipped++[idx])
-          |>unflip()
+          #    |>unflip()
         end
       end
     end

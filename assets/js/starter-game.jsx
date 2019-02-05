@@ -1,165 +1,115 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import _ from 'lodash';
+import React from "react";
+import ReactDOM from "react-dom";
+import _ from "lodash";
 
-export default function game_init(root) {
-  ReactDOM.render(<Game />, root);
+export default function game_init(root, channel) {
+  ReactDOM.render(<Game channel={channel} />, root);
 }
 
 class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      grids: initCards(),
-      onGoing: true,
+      grids: [],
+      on_going: true,
       steps: 0,
       flipped: [],
       matched: 0
     };
+    this.channel = props.channel;
+    this.channel
+      .join()
+      .receive("ok", this.init_state.bind(this))
+      .receive("error", resp => {
+        console.log(resp);
+      });
   }
 
-  //shuffle the deck and restart
-  reset() {
-    this.setState({ grids: initCards(), onGoing: true, steps: 0, flipped: [], matched: 0});
+  init_state(props) {
+    this.setState(props.game);
   }
 
   flipCard(idx) {
-    let card = this.state.grids[idx];
-    if(card.hidden && !card.matched && this.state.flipped.length<2) {
-      var newGrid = this.state.grids.slice();
-      newGrid[idx].hidden=false;
-      var allFlipped = this.state.flipped.slice();
-      allFlipped.push(idx);
-      var numOfMatch = this.state.matched;
-      //2 cards are now flipped
-      if(allFlipped.length==2) {
-         if(newGrid[allFlipped[0]].value==newGrid[allFlipped[1]].value) {
-	    var card1 = newGrid[allFlipped[0]];
-            var card2 = newGrid[allFlipped[1]];
-	    card1.matched = true;
-            card2.matched = true;
-	    this.setState({grids: newGrid, matched:numOfMatch+2, flipped: [], steps: this.state.steps+1}, ()=>{this.checkFinish()});
-	 }
-	 //2 cards have different value,delay unflip
-	 else {
-            this.setState({grids:newGrid, flipped: allFlipped, steps:this.state.steps+1},()=>{
-		    this.schedule()});
-	 }
+    this.channel
+      .push("flip", { index: idx })
+      .receive("ok", this.init_state.bind(this));
+    this.schedule();
+  }
 
-      }
-      //only one card is flipped
-      else {
-	  this.setState({grids: newGrid, flipped:allFlipped, steps:this.state.steps+1});
-      }
-    }
-}
-
-  checkFinish() {
-    if(this.state.matched==16 && this.state.onGoing) {
-       this.setState({onGoing:false});
-    }
+  reset() {
+    this.channel.push("restart").receive("ok", this.init_state.bind(this));
   }
 
   unflip() {
-      var idx1 = this.state.flipped[0];
-      var idx2 = this.state.flipped[1];
-      let card1 = this.state.grids[idx1];
-      let card2 = this.state.grids[idx2];
-      //if the card is flipped and has not been matched
-      if(!card1.hidden && !card1.matched && !card2.hidden && !card2.matched) {
-          var deck = this.state.grids.slice();
-          deck[idx1].hidden=true;
-          deck[idx2].hidden=true;
-          this.setState({grid:deck, flipped:[]});
-      }
+    this.channel.push("unflip").receive("ok", this.init_state.bind(this));
   }
 
-  //set delay for unflip 
+  //set delay for unflip
   schedule() {
-    if(this.state.onGoing && this.state.flipped.length==2) {
-       var unflipTime=setTimeout(this.unflip.bind(this),1000);
+    if (this.state.onGoing && this.state.flipped.length == 2) {
+      var unflipTime = setTimeout(this.unflip.bind(this), 1000);
     }
   }
 
-  render() { 
-    var table=[];
-    for(var j=0;j<4;j++) {
-      var row = _.map(this.state.grids.slice(4*j,4*j+4), (item) => {
-	  var key = item.idx;
-          return <ShowItems item={item} key={key} flipCard={this.flipCard.bind(this)} />;
+  render() {
+    var table = [];
+    for (var j = 0; j < 4; j++) {
+      var row = _.map(this.state.grids.slice(4 * j, 4 * j + 4), item => {
+        var key = item.index;
+        return (
+          <ShowItems
+            item={item}
+            key={key}
+            flipCard={this.flipCard.bind(this)}
+          />
+        );
       });
-      var temp = (<div key={j}>{row}</div>);
+      var temp = <div key={j}>{row}</div>;
       table.push(temp);
     }
     return (
       <div>
         <h1>hw04</h1>
-	<RenderStatus steps={this.state.steps} />
+        <RenderStatus steps={this.state.steps} />
         {table}
-	<RenderSuccess ongoing={this.state.onGoing}/> 
-	<button onClick={() => this.reset()}>reset</button>
+        <RenderSuccess ongoing={this.state.onGoing} />
+        <button onClick={() => this.reset()}>reset</button>
       </div>
     );
   }
 }
 
 //display cards
-function  ShowItems(props) {
-  if(props.item.hidden){
-      return (
-        <span>
-          <button class="card" value={props.item.value} onClick={()=>props.flipCard(props.item.idx)}>
-              ?
-	  </button>
-        </span>
-      );
-  }
-  else {
-      return (
-        <span>
-          <button class="card" value={props.item.value} onClick={()=>props.flipCard(props.item.idx)}>
-              {props.item.value}
-          </button>
-        </span>
-      );
+function ShowItems(props) {
+  if (props.item.value == "") {
+    return (
+      <span>
+        <button class="card" onClick={() => props.flipCard(props.item.index)}>
+          ?
+        </button>
+      </span>
+    );
+  } else {
+    return (
+      <span>
+        <button class="card" onClick={() => props.flipCard(props.item.index)}>
+          {props.item.value}
+        </button>
+      </span>
+    );
   }
 }
-function initCards() {
-   var all = ["A", "B", "C", "D", "E", "F", "G", "H"];
-    var grid = [];
-    all = all.concat(all);
-    while (all.length > 0) {
-      var rand = Math.floor(Math.random() * all.length);
-      var l = grid.length;
-      var item = { value: all[rand], hidden: true, matched: false, idx: grid.length};
-      grid.push(item);
-      all.splice(rand, 1);
-    }
-    return grid;
-}
-
 
 function RenderStatus(props) {
-   return (
-      <div>
-          <p>steps:{props.steps}</p>
-      </div>
-   );
+  return (
+    <div>
+      <p>steps:{props.steps}</p>
+    </div>
+  );
 }
 
 function RenderSuccess(props) {
-	var result="";
-  (props.ongoing===true)? result="make a guess!" : result="you win!";
-  return (<p>{result}</p>);
+  var result = "";
+  props.ongoing === true ? (result = "make a guess!") : (result = "you win!");
+  return <p>{result}</p>;
 }
-
-
-
-
-
-
-
-
-
-
-
