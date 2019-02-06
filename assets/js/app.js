@@ -18,10 +18,10 @@ import $ from "jquery";
 // import socket from "./socket"
 
 import game_init from "./starter-game";
-
+import socket from "./socket"
 $(() => {
   let root = document.getElementById('root');
-  let channel = socket.channel("games:" + window.gameName,{});
+  let channel = socket.channel("games:memory",{});
   game_init(root, channel);
 });
 

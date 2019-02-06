@@ -23,6 +23,7 @@ class Game extends React.Component {
       .receive("error", resp => {
         console.log(resp);
       });
+    console.log(this.state);
   }
 
   init_state(props) {
@@ -30,6 +31,7 @@ class Game extends React.Component {
   }
 
   flipCard(idx) {
+    console.log("flip "+ idx.toString());
     this.channel
       .push("flip", { index: idx })
       .receive("ok", this.init_state.bind(this));
@@ -64,6 +66,7 @@ class Game extends React.Component {
           />
         );
       });
+      console.log(this.state.on_going)
       var temp = <div key={j}>{row}</div>;
       table.push(temp);
     }
@@ -72,7 +75,7 @@ class Game extends React.Component {
         <h1>hw04</h1>
         <RenderStatus steps={this.state.steps} />
         {table}
-        <RenderSuccess ongoing={this.state.onGoing} />
+        <RenderSuccess ongoing={this.state.on_going} />
         <button onClick={() => this.reset()}>reset</button>
       </div>
     );
@@ -113,3 +116,5 @@ function RenderSuccess(props) {
   props.ongoing === true ? (result = "make a guess!") : (result = "you win!");
   return <p>{result}</p>;
 }
+
+

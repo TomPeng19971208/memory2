@@ -25,7 +25,6 @@ defmodule Memory.Game do
   def init_deck() do
     all=["A", "B", "C", "D", "E", "F", "G", "H"];
     all=Enum.shuffle(all++all)
-    IO.inspect(all)
     deck_helper(all, [], 0)
   end
 
@@ -61,8 +60,6 @@ defmodule Memory.Game do
   def unflip(game) do
     idx1=hd(game.flipped)
     idx2=Enum.fetch!(game.flipped,1)
-    IO.puts(idx1)
-    IO.puts(idx2)
     c1=Enum.fetch!(game.grids, idx1)
     c2=Enum.fetch!(game.grids, idx2)
     new_deck=List.replace_at(game.grids,idx1,

@@ -5,7 +5,7 @@ defmodule MemoryWeb.GamesChannel do
   def join("games:"<> name, payload, socket) do
     if authorized?(payload) do
       game = Game.new_game()
-      socket=socket
+      socket = socket
       |> assign(:game, game)
       |> assign(:name, name)
       {:ok, %{"join" => name, "game" => Game.client_view(game)}, socket}
@@ -33,6 +33,7 @@ defmodule MemoryWeb.GamesChannel do
     game = Game.flip(game, idx)
     socket = assign(socket, :game, game)
     {:reply, {:ok, %{"game"=>Game.client_view(game)}}, socket}
+    IO.inspect(socket.assigns[:game].grids)
   end
 
 
@@ -45,7 +46,7 @@ defmodule MemoryWeb.GamesChannel do
 
   def handle_in("unflip", payload, socket) do
     game = socket.assigns[:game]
-    Game.unflip(game)
+    game = Game.unflip(game)
     {:reply, {:ok, %{"game" => Game.client_view(game)}, socket}}
   end
 
