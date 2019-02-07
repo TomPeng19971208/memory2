@@ -84,7 +84,6 @@ defmodule Memory.Game do
     IO.inspect(game.grids)
     deck=game.grids
     target=Enum.fetch!(deck, idx)
-    l = length(game.flipped)
     if !target.flipped and !target.matched  do
       l=length(game.flipped)
       

@@ -1,3 +1,7 @@
+<script>
+  window.name = "<%= @name %>";
+</script>
+
 <div class="row">
   <div class="column">
     <h1>Game: <%= @name %></h1>

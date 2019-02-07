@@ -67,7 +67,6 @@ class Game extends React.Component {
     }
     return (
       <div>
-        <h1>hw04</h1>
         <RenderStatus steps={this.state.steps} />
         {table}
         <RenderSuccess ongoing={this.state.on_going} />

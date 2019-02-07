@@ -22,7 +22,7 @@ import socket from "./socket"
 $(() => {
   let root = document.getElementById('root');
   if(root) {
-    let channel = socket.channel("games: " + "memory", {});
+    let channel = socket.channel("games: " + window.name, {});
     game_init(root, channel);
   }
 });
