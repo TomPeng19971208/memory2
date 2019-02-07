@@ -21,7 +21,9 @@ import game_init from "./starter-game";
 import socket from "./socket"
 $(() => {
   let root = document.getElementById('root');
-  let channel = socket.channel("games:memory",{});
-  game_init(root, channel);
+  if(root) {
+    let channel = socket.channel("games: " + "memory", {});
+    game_init(root, channel);
+  }
 });
 

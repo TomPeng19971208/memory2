@@ -23,34 +23,32 @@ class Game extends React.Component {
       .receive("error", resp => {
         console.log(resp);
       });
-    console.log(this.state);
   }
 
   init_state(props) {
     this.setState(props.game);
+    console.log("change state");
+    console.log(props.game);
   }
 
   flipCard(idx) {
-    console.log("flip "+ idx.toString());
+	  console.log(idx);
     this.channel
       .push("flip", { index: idx })
-      .receive("ok", this.init_state.bind(this));
-    this.schedule();
+      .receive("ok", this.init_state.bind(this))
+      .receive("schedule",resp => {
+	 this.init_state(resp);
+	 this.unflip(resp);
+      });
   }
 
   reset() {
     this.channel.push("restart").receive("ok", this.init_state.bind(this));
   }
 
-  unflip() {
-    this.channel.push("unflip").receive("ok", this.init_state.bind(this));
-  }
-
-  //set delay for unflip
-  schedule() {
-    if (this.state.onGoing && this.state.flipped.length == 2) {
-      var unflipTime = setTimeout(this.unflip.bind(this), 1000);
-    }
+  unflip(props) {
+    console.log("unflip");
+    setTimeout(()=>{this.channel.push("unflip").receive("ok", this.init_state.bind(this))}, 1000);
   }
 
   render() {
@@ -66,7 +64,6 @@ class Game extends React.Component {
           />
         );
       });
-      console.log(this.state.on_going)
       var temp = <div key={j}>{row}</div>;
       table.push(temp);
     }

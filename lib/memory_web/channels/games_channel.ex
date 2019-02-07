@@ -32,8 +32,11 @@ defmodule MemoryWeb.GamesChannel do
     game = socket.assigns[:game]
     game = Game.flip(game, idx)
     socket = assign(socket, :game, game)
-    {:reply, {:ok, %{"game"=>Game.client_view(game)}}, socket}
-    IO.inspect(socket.assigns[:game].grids)
+    if length(game.flipped)==2 do
+      {:reply, {:schedule, %{"game" => Game.client_view(game)}}, socket}
+    else
+      {:reply, {:ok, %{"game" => Game.client_view(game)}}, socket}
+    end
   end
 
 
@@ -47,7 +50,7 @@ defmodule MemoryWeb.GamesChannel do
   def handle_in("unflip", payload, socket) do
     game = socket.assigns[:game]
     game = Game.unflip(game)
-    {:reply, {:ok, %{"game" => Game.client_view(game)}, socket}}
+    {:reply, {:ok, %{"game" => Game.client_view(game)}}, socket}
   end
 
 
