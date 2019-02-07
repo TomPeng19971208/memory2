@@ -1,13 +1,15 @@
 defmodule MemoryWeb.GamesChannel do
   use MemoryWeb, :channel
   alias Memory.Game
+  alias Memory.Backup
 
   def join("games:"<> name, payload, socket) do
     if authorized?(payload) do
-      game = Game.new_game()
+      game = Backup.get(name) || Game.new_game()
       socket = socket
       |> assign(:game, game)
       |> assign(:name, name)
+      Backup.put(name, game)
       {:ok, %{"join" => name, "game" => Game.client_view(game)}, socket}
     else
       {:error, %{reason: "unauthorized"}}
@@ -32,6 +34,7 @@ defmodule MemoryWeb.GamesChannel do
     game = socket.assigns[:game]
     game = Game.flip(game, idx)
     socket = assign(socket, :game, game)
+    Backup.put(socket.assigns[:name], game)
     if length(game.flipped)==2 do
       {:reply, {:schedule, %{"game" => Game.client_view(game)}}, socket}
     else
@@ -44,12 +47,15 @@ defmodule MemoryWeb.GamesChannel do
   def handle_in("restart", payload, socket) do
     game = Game.new_game()
     socket = assign(socket, :game, game)
+    Backup.put(socket.assigns[:name], game)
     {:reply, {:ok, %{"game" => Game.client_view(game)}}, socket}
   end
 
   def handle_in("unflip", payload, socket) do
     game = socket.assigns[:game]
     game = Game.unflip(game)
+    socket = assign(socket, :game, game)
+    Backup.put(socket.assigns[:name], game)
     {:reply, {:ok, %{"game" => Game.client_view(game)}}, socket}
   end
 

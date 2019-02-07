@@ -13,8 +13,8 @@ defmodule Memory.Game do
   #game states that are passed to frontend
   def client_view(game) do
     %{ 
-      grids: game.grids,
-      #grids: filter_cards(game.grids),
+      #grids: game.grids,
+      grids: filter_cards(game.grids),
       on_going: game.on_going, 
       steps: game.steps,
       flipped: game.flipped,
@@ -61,18 +61,16 @@ defmodule Memory.Game do
   def unflip(game) do
     IO.puts("unflip")
     idx1=hd(game.flipped)
-    idx2=Enum.fetch!(game.flipped,1)
+    idx2=Enum.fetch!(game.flipped, 1)
     c1=Enum.fetch!(game.grids, idx1)
     c2=Enum.fetch!(game.grids, idx2)
     if !c1.matched and !c2.matched do
       IO.puts("unmatched unflip")
-      new_deck=List.replace_at(game.grids,idx1,
-              %{value: c1.value, flipped: false, index: idx1, matched: false})    
-      new_deck=List.replace_at(new_deck,idx2,
-        %{value: c2.value, flipped: false, index: idx2, matched: false})
+      new_deck=List.replace_at(game.grids,idx1,%{value: c1.value, flipped: false, index: idx1, matched: false})    
+      new_deck=List.replace_at(new_deck,idx2, %{value: c2.value, flipped: false, index: idx2, matched: false})
       IO.inspect(new_deck)
-      game
-      |> Map.put(:grids, new_deck)
+      #game
+      Map.put(game, :grids, new_deck)
       |> Map.put(:flipped, [])
     else
       IO.puts("matched unflip")
@@ -86,7 +84,8 @@ defmodule Memory.Game do
     IO.inspect(game.grids)
     deck=game.grids
     target=Enum.fetch!(deck, idx)
-    if !target.flipped and !target.matched do
+    l = length(game.flipped)
+    if !target.flipped and !target.matched  do
       l=length(game.flipped)
       
       #no cards have been flipped yet, just flip the card

@@ -28,18 +28,14 @@ class Game extends React.Component {
   init_state(props) {
     this.setState(props.game);
     console.log("change state");
-    console.log(props.game);
+    console.log(this.state);
   }
 
   flipCard(idx) {
-	  console.log(idx);
-    this.channel
-      .push("flip", { index: idx })
-      .receive("ok", this.init_state.bind(this))
-      .receive("schedule",resp => {
-	 this.init_state(resp);
-	 this.unflip(resp);
-      });
+    this.channel       
+    .push("flip", { index: idx })
+    .receive("ok", this.init_state.bind(this))
+    .receive("schedule",this.unflip.bind(this));
   }
 
   reset() {
@@ -48,7 +44,9 @@ class Game extends React.Component {
 
   unflip(props) {
     console.log("unflip");
-    setTimeout(()=>{this.channel.push("unflip").receive("ok", this.init_state.bind(this))}, 1000);
+    this.init_state(props);
+    //this.channel.push("unflip").receive("ok", );
+    setTimeout(()=>{this.channel.push("unflip", { game: props.game }).receive("ok", this.init_state.bind(this))}, 1000);
   }
 
   render() {
@@ -92,7 +90,7 @@ function ShowItems(props) {
   } else {
     return (
       <span>
-        <button class="card" onClick={() => props.flipCard(props.item.index)}>
+        <button class="card">
           {props.item.value}
         </button>
       </span>
